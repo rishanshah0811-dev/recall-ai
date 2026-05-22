@@ -1,69 +1,138 @@
 # Recall
 
-A self-learning AI assistant that builds a persistent memory of who you are across every conversation.
+An AI assistant that actually remembers who you are.
 
-Most chatbots forget everything when you close the tab. Recall doesn't. It extracts meaningful facts from your conversations, stores them in a vector database, and uses them to give you increasingly personalized responses over time. The more you talk to it, the better it knows you.
+Most chatbots reset every time you close the tab. Recall doesn't. It picks up facts from your conversations — your name, your job, what you're working on, what you care about — and stores them as vector embeddings. Next time you come back, it already knows you. The more you talk to it, the sharper it gets.
 
-**Live demo**: [recall-ai-rishanshah0811-devs-projects.vercel.app](https://recall-ai-rishanshah0811-devs-projects.vercel.app)
+**[Try it live](https://recall-ai-rishanshah0811-devs-projects.vercel.app)**
 
-## How it works
+![Recall screenshot](docs/demo-screenshot.png)
 
-Recall uses a two-phase memory pipeline:
+---
 
-**Phase 1 — Extract and Store**
-After each conversation exchange, the system analyzes the dialogue and extracts factual information about the user. These facts are categorized (Personal, Professional, Preference, Goal) and stored as vector embeddings in Qdrant Cloud. When a new fact contradicts an existing memory, the old one gets updated or replaced automatically.
+## What it does
 
-**Phase 2 — Retrieve and Respond**
-When the user sends a message, the system performs a semantic search against stored memories to find the most relevant context. Those memories are injected into the system prompt, allowing the AI to reference past conversations naturally without being told to. The result is a conversation that feels continuous across sessions.
+When you chat with Recall, two things happen behind the scenes:
 
-The memory panel on the right side of the interface shows this process in real time. You can watch new memories appear as the AI learns about you, see what category each fact falls into, and delete anything you want forgotten.
+1. **Memory extraction** — After each exchange, Gemini analyzes the conversation and pulls out factual information (name, preferences, goals, job details). Each fact gets embedded as a vector and stored in Qdrant Cloud.
+
+2. **Contextual retrieval** — When you send a new message, the system runs a semantic search against your stored memories. The most relevant ones get injected into the system prompt so the AI can reference them naturally, without you having to repeat yourself.
+
+The right-side panel shows this happening in real time. You can watch memories appear, see their categories, and delete anything you want forgotten.
+
+## Features
+
+- Persistent memory across sessions using vector similarity search
+- Real-time memory panel with live updates and category tagging
+- SSE streaming responses (tokens render as they arrive)
+- Automatic fact extraction and deduplication
+- Memory categories: Personal, Professional, Preferences, Goals
+- Delete individual memories with one click
+- Mobile-responsive with a slide-up memory drawer
+- Animated UI with motion/react (spring physics, staggered reveals)
 
 ## Tech stack
 
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS v4, motion/react
-- **Backend**: Next.js API routes (server-side), Gemini 2.0 Flash, Qdrant Cloud
-- **Memory**: Custom fact extraction via Gemini, vector embeddings via text-embedding-004, semantic search via Qdrant
-- **Streaming**: Server-Sent Events for real-time chat responses
-- **Deployment**: Vercel (full stack), Qdrant Cloud (vector DB)
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 16, TypeScript |
+| Styling | Tailwind CSS v4, custom CSS variables |
+| Animations | motion/react (springs, AnimatePresence, layout) |
+| LLM | Gemini 2.0 Flash (chat + fact extraction) |
+| Embeddings | Google text-embedding-004 (768-dim vectors) |
+| Vector DB | Qdrant Cloud (semantic search, payload filtering) |
+| Streaming | Server-Sent Events via ReadableStream |
+| Deployment | Vercel (full stack) |
 
-## Local setup
+## How it works
 
-### Prerequisites
+```
+User message
+    │
+    ├──▶ Semantic search against stored memories (Qdrant)
+    │        │
+    │        ▼
+    │    Relevant memories injected into system prompt
+    │        │
+    │        ▼
+    │    Gemini generates streamed response
+    │        │
+    │        ▼
+    │    Tokens sent to client via SSE
+    │
+    └──▶ After response completes:
+              │
+              ▼
+         Gemini extracts facts from the exchange
+              │
+              ▼
+         New facts embedded and stored in Qdrant
+              │
+              ▼
+         Memory panel updates in real time
+```
 
-- Node.js 18+
-- A [Qdrant Cloud](https://cloud.qdrant.io/) account (free tier works)
-- A [Google AI Studio](https://aistudio.google.com/) API key for Gemini
+## Run it locally
 
-### Install and run
+You'll need a [Qdrant Cloud](https://cloud.qdrant.io/) account (free tier) and a [Google AI Studio](https://aistudio.google.com/) API key.
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env.local` file in the frontend directory:
+Create `frontend/.env.local`:
 
 ```
-GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=your_key
 QDRANT_URL=https://your-cluster.cloud.qdrant.io
-QDRANT_API_KEY=your_qdrant_api_key
+QDRANT_API_KEY=your_key
 DEFAULT_USER_ID=default_user
 ```
-
-Start the dev server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start chatting.
+Open `http://localhost:3000`. Tell it your name, close the tab, come back, and ask if it remembers you.
 
 ## API routes
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/chat/stream` | Stream a chat response via SSE |
-| GET | `/api/memories` | Get all stored memories |
-| DELETE | `/api/memories/{id}` | Delete a specific memory |
-| GET | `/api/memories/count` | Get total memory count |
-| GET | `/api/health` | Health check with Qdrant status |
+| Method | Path | What it does |
+|--------|------|--------------|
+| POST | `/api/chat/stream` | Streams a chat response via SSE |
+| GET | `/api/memories` | Returns all stored memories for a user |
+| DELETE | `/api/memories/[id]` | Deletes a specific memory |
+| GET | `/api/memories/count` | Returns total memory count |
+| GET | `/api/health` | Health check (includes Qdrant connection status) |
+
+## Project structure
+
+```
+frontend/
+├── app/
+│   ├── api/                  # Server-side API routes
+│   │   ├── chat/stream/      # SSE streaming endpoint
+│   │   ├── health/           # Qdrant health check
+│   │   └── memories/         # CRUD for memories
+│   ├── page.tsx              # Main app layout (chat + memory panel)
+│   ├── layout.tsx            # Root layout with fonts
+│   └── globals.css           # Design tokens, animations, effects
+├── components/
+│   ├── ChatPanel.tsx         # Chat interface with input
+│   ├── MessageBubble.tsx     # Individual message rendering
+│   ├── MemoryPanel.tsx       # Right-side memory list
+│   ├── MemoryCard.tsx        # Single memory with category + delete
+│   ├── MemoryStats.tsx       # Memory count display
+│   └── TypingIndicator.tsx   # Bouncing dots during streaming
+├── hooks/
+│   └── useSSE.ts             # Custom hook for SSE streaming
+├── lib/
+│   ├── api.ts                # Client-side API helpers
+│   ├── types.ts              # TypeScript interfaces
+│   └── server/               # Server-only modules
+│       ├── chat.ts           # Gemini chat with memory context
+│       ├── memory.ts         # Fact extraction, embedding, CRUD
+│       ├── gemini.ts         # Gemini client singleton
+│       └── qdrant.ts         # Qdrant client singleton
+```
