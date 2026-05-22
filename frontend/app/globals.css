@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: "Lora", Georgia, serif;
+  --font-body: "Geist", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+}
+
+:root {
+  --bg: #0c0c0e;
+  --surface: #141416;
+  --surface-raised: #1c1c20;
+  --border: #232328;
+  --border-subtle: #1a1a1e;
+  --text-primary: #e8e8ec;
+  --text-secondary: #5a5a6e;
+  --text-tertiary: #3a3a4a;
+  --accent: #7c5bf0;
+  --accent-muted: rgba(124, 91, 240, 0.08);
+  --accent-glow: rgba(124, 91, 240, 0.15);
+  --gradient-start: rgba(124, 91, 240, 0.04);
+  --gradient-end: rgba(124, 91, 240, 0);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #14141a 0%, #1a1a24 100%);
+  border-left: 2px solid var(--accent);
+}
+
+.typing-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-5px); opacity: 0.8; }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor-blink {
+  animation: cursorBlink 0.9s step-end infinite;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+.ambient-glow {
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse, rgba(124, 91, 240, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-br {
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(ellipse, rgba(124, 91, 240, 0.02) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+.input-glow:focus-within {
+  box-shadow: 0 0 0 1px rgba(124, 91, 240, 0.2), 0 0 20px -8px rgba(124, 91, 240, 0.15);
+}
+
+.memory-glow {
+  box-shadow: 0 0 20px -4px rgba(124, 91, 240, 0.2), inset 0 1px 0 rgba(124, 91, 240, 0.06);
+}
+
+.send-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, #6344d0 100%);
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.send-btn:hover:not(:disabled) {
+  box-shadow: 0 0 24px -4px rgba(124, 91, 240, 0.4);
+  transform: translateY(-1px);
+}
+
+.send-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.stat-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  border: 1px solid var(--border-subtle);
+}
+
+.divider-gradient {
+  background: linear-gradient(180deg, var(--border) 0%, transparent 50%, var(--border) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
