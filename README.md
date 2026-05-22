@@ -4,6 +4,8 @@ A self-learning AI assistant that builds a persistent memory of who you are acro
 
 Most chatbots forget everything when you close the tab. Recall doesn't. It extracts meaningful facts from your conversations, stores them in a vector database, and uses them to give you increasingly personalized responses over time. The more you talk to it, the better it knows you.
 
+**Live demo**: [recall-ai-rishanshah0811-devs-projects.vercel.app](https://recall-ai-rishanshah0811-devs-projects.vercel.app)
+
 ## How it works
 
 Recall uses a two-phase memory pipeline:
@@ -18,55 +20,34 @@ The memory panel on the right side of the interface shows this process in real t
 
 ## Tech stack
 
-- **Backend**: Python, FastAPI, Mem0 (memory extraction and management), Qdrant Cloud (vector storage), Gemini 2.5 Flash (LLM)
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, Server-Sent Events for streaming
-- **Deployment**: Railway (backend), Vercel (frontend), Qdrant Cloud (vector DB)
+- **Frontend**: Next.js 16, TypeScript, Tailwind CSS v4, motion/react
+- **Backend**: Next.js API routes (server-side), Gemini 2.0 Flash, Qdrant Cloud
+- **Memory**: Custom fact extraction via Gemini, vector embeddings via text-embedding-004, semantic search via Qdrant
+- **Streaming**: Server-Sent Events for real-time chat responses
+- **Deployment**: Vercel (full stack), Qdrant Cloud (vector DB)
 
 ## Local setup
 
 ### Prerequisites
 
-- Python 3.11+
 - Node.js 18+
 - A [Qdrant Cloud](https://cloud.qdrant.io/) account (free tier works)
 - A [Google AI Studio](https://aistudio.google.com/) API key for Gemini
 
-### Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Create a `.env` file in the backend directory:
-
-```
-GEMINI_API_KEY=your_gemini_api_key
-QDRANT_URL=https://your-cluster.cloud.qdrant.io:6333
-QDRANT_API_KEY=your_qdrant_api_key
-FRONTEND_URL=http://localhost:3000
-DEFAULT_USER_ID=default_user
-```
-
-Start the server:
-
-```bash
-uvicorn main:app --reload --port 8000
-```
-
-### Frontend
+### Install and run
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env.local` file:
+Create a `.env.local` file in the frontend directory:
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:8000
+GEMINI_API_KEY=your_gemini_api_key
+QDRANT_URL=https://your-cluster.cloud.qdrant.io
+QDRANT_API_KEY=your_qdrant_api_key
+DEFAULT_USER_ID=default_user
 ```
 
 Start the dev server:
@@ -75,14 +56,14 @@ Start the dev server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start talking.
+Open [http://localhost:3000](http://localhost:3000) and start chatting.
 
-## API endpoints
+## API routes
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/chat/stream` | Stream a chat response via SSE |
-| GET | `/memories` | Get all stored memories |
-| DELETE | `/memories/{id}` | Delete a specific memory |
-| GET | `/memories/count` | Get total memory count |
-| GET | `/health` | Health check with Qdrant status |
+| POST | `/api/chat/stream` | Stream a chat response via SSE |
+| GET | `/api/memories` | Get all stored memories |
+| DELETE | `/api/memories/{id}` | Delete a specific memory |
+| GET | `/api/memories/count` | Get total memory count |
+| GET | `/api/health` | Health check with Qdrant status |
