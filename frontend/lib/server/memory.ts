@@ -1,5 +1,6 @@
 import { getQdrantClient, COLLECTION_NAME } from "./qdrant";
-import { getGenAI, EMBEDDING_MODEL, CHAT_MODEL } from "./gemini";
+import type { EmbedContentRequest } from "@google/generative-ai";
+import { getGenAI, EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, CHAT_MODEL } from "./gemini";
 import { randomUUID } from "crypto";
 
 const FACT_EXTRACTION_PROMPT = `You are a Personal Memory Manager. Extract important facts from this conversation as concise declarative sentences.
@@ -27,7 +28,11 @@ Conversation:
 async function embed(text: string): Promise<number[]> {
   const genai = getGenAI();
   const model = genai.getGenerativeModel({ model: EMBEDDING_MODEL });
-  const result = await model.embedContent(text);
+  // The legacy SDK's types lack outputDimensionality, but it forwards the request body as-is.
+  const result = await model.embedContent({
+    content: { role: "user", parts: [{ text }] },
+    outputDimensionality: EMBEDDING_DIMENSIONS,
+  } as EmbedContentRequest);
   return result.embedding.values as number[];
 }
 
@@ -37,7 +42,7 @@ async function ensureCollection() {
     await client.getCollection(COLLECTION_NAME);
   } catch {
     await client.createCollection(COLLECTION_NAME, {
-      vectors: { size: 768, distance: "Cosine" },
+      vectors: { size: EMBEDDING_DIMENSIONS, distance: "Cosine" },
     });
     await client.createPayloadIndex(COLLECTION_NAME, {
       field_name: "user_id",

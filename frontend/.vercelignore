@@ -1,0 +1,7 @@
+# The Vercel CLI does not read .gitignore. Keep local secrets out of deploys.
+.env
+.env.*
+!.env.example
+node_modules
+.next
+.vercel

@@ -38,8 +38,8 @@ The right-side panel shows this happening in real time. You can watch memories a
 | Framework | Next.js 16, TypeScript |
 | Styling | Tailwind CSS v4, custom CSS variables |
 | Animations | motion/react (springs, AnimatePresence, layout) |
-| LLM | Gemini 2.0 Flash (chat + fact extraction) |
-| Embeddings | Google text-embedding-004 (768-dim vectors) |
+| LLM | Gemini 3.6 Flash (chat + fact extraction) |
+| Embeddings | Google gemini-embedding-2 (768-dim vectors) |
 | Vector DB | Qdrant Cloud (semantic search, payload filtering) |
 | Streaming | Server-Sent Events via ReadableStream |
 | Deployment | Vercel (full stack) |
